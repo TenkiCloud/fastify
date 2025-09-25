@@ -242,12 +242,16 @@ jobs:
       - name: install webpack stack
         run: |
           cd test/bundler/webpack && npm install --ignore-scripts
+        env:
+          npm_config_registry: https://registry.npmjs.org/
       - name: Test webpack bundle
         run: |
           cd test/bundler/webpack && npm run test
       - name: install esbuild stack
         run: |
           cd test/bundler/esbuild && npm install --ignore-scripts
+        env:
+          npm_config_registry: https://registry.npmjs.org/
       - name: Test esbuild bundle
         run: |
           cd test/bundler/esbuild && npm run test
