@@ -32,7 +32,7 @@ jobs:
   dependency-review:
       name: Dependency Review
       # if: github.event_name == 'pull_request'
-      runs-on: ubuntu-latest
+      runs-on: tenki-standard-autoscale
       permissions:
         contents: read
       steps:
@@ -46,7 +46,7 @@ jobs:
 
   check-licenses:
     name: Check licenses
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     permissions:
       contents: read
     steps:
@@ -72,7 +72,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     permissions:
       contents: read
     steps:
@@ -122,8 +122,8 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22, 24]
-        os: [ubuntu-latest]
-        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [tenki-standard-autoscale]
+        # os: [macos-latest, tenki-standard-autoscale, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -149,7 +149,7 @@ jobs:
   # Useful for testing Release Candidates of Node.js
   test-unit-custom:
     # if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     permissions:
       contents: read
 
@@ -179,7 +179,7 @@ jobs:
       - lint
       - coverage-nix
       - coverage-win
-    runs-on: 'ubuntu-latest'
+    runs-on: 'tenki-standard-autoscale'
     permissions:
       contents: read
 
@@ -209,7 +209,7 @@ jobs:
     needs:
       - test-typescript
       - test-unit
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     permissions:
       contents: read
     steps:
@@ -248,7 +248,7 @@ jobs:
   #     - test-typescript
   #     - test-unit
   #     - package
-  #   runs-on: ubuntu-latest
+  #   runs-on: tenki-standard-autoscale
   #   permissions:
   #     pull-requests: write
   #     contents: write
