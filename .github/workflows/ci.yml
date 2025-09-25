@@ -31,7 +31,7 @@ permissions:
 jobs:
   dependency-review:
       name: Dependency Review
-      if: github.event_name == 'pull_request'
+      # if: github.event_name == 'pull_request'
       runs-on: ubuntu-latest
       permissions:
         contents: read
@@ -148,7 +148,7 @@ jobs:
 
   # Useful for testing Release Candidates of Node.js
   test-unit-custom:
-    if: github.event_name == 'workflow_dispatch'
+    # if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -161,7 +161,7 @@ jobs:
       - name: Use Custom Node.js Version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ github.event.inputs.nodejs-version }}
+          # node-version: ${{ github.event.inputs.nodejs-version }}
           cache: 'npm'
           cache-dependency-path: package.json
           check-latest: true
@@ -239,20 +239,20 @@ jobs:
         run: |
           cd test/bundler/esbuild && npm run test
 
-  automerge:
-    if: >
-        github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        github.event.pull_request.user.login == 'dependabot[bot]'
-    needs:
-      - test-typescript
-      - test-unit
-      - package
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+  # automerge:
+  #   if: >
+  #       github.event_name == 'pull_request' &&
+  #       github.event.pull_request.head.repo.full_name == github.repository &&
+  #       github.event.pull_request.user.login == 'dependabot[bot]'
+  #   needs:
+  #     - test-typescript
+  #     - test-unit
+  #     - package
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     pull-requests: write
+  #     contents: write
+  #   steps:
+  #     - uses: fastify/github-action-merge-dependabot@v3
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
