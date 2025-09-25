@@ -62,7 +62,9 @@ jobs:
           cache-dependency-path: package.json
           check-latest: true
 
-      - run: npm install --ignore-scripts
+      - name: Install
+        run: |
+          npm install --ignore-scripts
         env:
           npm_config_registry: https://registry.npmjs.org/
 
@@ -92,7 +94,9 @@ jobs:
       - name: Install
         run: |
           npm install --ignore-scripts
-
+        env:
+          npm_config_registry: https://registry.npmjs.org/
+          
       - name: Lint code
         run: |
           npm run lint
