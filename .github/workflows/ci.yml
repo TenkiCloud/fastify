@@ -146,6 +146,8 @@ jobs:
       - name: Install
         run: |
           npm install --ignore-scripts
+        env:
+          npm_config_registry: https://registry.npmjs.org/
 
       - name: Run tests
         run: |
@@ -174,6 +176,8 @@ jobs:
       - name: Install
         run: |
           npm install --ignore-scripts
+        env:
+          npm_config_registry: https://registry.npmjs.org/
 
       - name: Run tests
         run: |
@@ -203,6 +207,8 @@ jobs:
       - name: Install
         run: |
           npm install --ignore-scripts
+        env:
+          npm_config_registry: https://registry.npmjs.org/
 
       - name: Run typescript tests
         run: |
