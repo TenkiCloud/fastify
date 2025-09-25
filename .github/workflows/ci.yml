@@ -234,9 +234,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package.json
           check-latest: true
-      - name: install fastify
+      - name: Install
         run: |
           npm install --ignore-scripts
+        env:
+          npm_config_registry: https://registry.npmjs.org/
       - name: install webpack stack
         run: |
           cd test/bundler/webpack && npm install --ignore-scripts
