@@ -17,8 +17,18 @@ on:
     inputs:
       nodejs-version:
         description: 'Node.js version to use (e.g., 24.0.0-rc.1)'
-        required: true
+        required: false
         type: string
+      use-npm-registry:
+        description: 'Use npm registry (https://registry.npmjs.org/)'
+        required: false
+        type: boolean
+        default: false
+      runner-label:
+        description: 'Runner label to use for jobs'
+        required: false
+        type: string
+        default: 'tenki-standard-autoscale'
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -32,7 +42,7 @@ jobs:
   dependency-review:
       name: Dependency Review
       # if: github.event_name == 'pull_request'
-      runs-on: tenki-standard-autoscale
+      runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
       permissions:
         contents: read
       steps:
@@ -46,7 +56,7 @@ jobs:
 
   check-licenses:
     name: Check licenses
-    runs-on: tenki-standard-autoscale
+    runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
     permissions:
       contents: read
     steps:
@@ -57,7 +67,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: ${{ inputs.nodejs-version || 'lts/*' }}
           cache: 'npm'
           cache-dependency-path: package.json
           check-latest: true
@@ -66,8 +76,7 @@ jobs:
         run: |
           npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
-
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
 
       - name: Check licenses
         run: |
@@ -75,7 +84,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: tenki-standard-autoscale
+    runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
     permissions:
       contents: read
     steps:
@@ -86,7 +95,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: ${{ inputs.nodejs-version || 'lts/*' }}
           cache: 'npm'
           cache-dependency-path: package.json
           check-latest: true
@@ -95,7 +104,7 @@ jobs:
         run: |
           npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
           
       - name: Lint code
         run: |
@@ -107,6 +116,9 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/coverage-nix.yml
+    with:
+      use-npm-registry: ${{ inputs.use-npm-registry || false }}
+      runner-label: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
 
   coverage-win:
     needs:
@@ -114,6 +126,9 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/coverage-win.yml
+    with:
+      use-npm-registry: ${{ inputs.use-npm-registry || false }}
+      runner-label: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
 
   test-unit:
     needs:
@@ -127,8 +142,8 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22, 24]
-        os: [tenki-standard-autoscale]
-        # os: [macos-latest, tenki-standard-autoscale, windows-latest]
+        os: ['${{ inputs.runner-label || ''tenki-standard-autoscale'' }}']
+        # os: [macos-latest, ${{ inputs.runner-label || 'tenki-standard-autoscale' }}, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -147,7 +162,7 @@ jobs:
         run: |
           npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
 
       - name: Run tests
         run: |
@@ -156,7 +171,8 @@ jobs:
   # Useful for testing Release Candidates of Node.js
   test-unit-custom:
     # if: github.event_name == 'workflow_dispatch'
-    runs-on: tenki-standard-autoscale
+    if: ${{ inputs.nodejs-version != '' }}
+    runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
     permissions:
       contents: read
 
@@ -168,7 +184,7 @@ jobs:
       - name: Use Custom Node.js Version
         uses: actions/setup-node@v4
         with:
-          # node-version: ${{ github.event.inputs.nodejs-version }}
+          node-version: ${{ inputs.nodejs-version }}
           cache: 'npm'
           cache-dependency-path: package.json
           check-latest: true
@@ -177,7 +193,7 @@ jobs:
         run: |
           npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
 
       - name: Run tests
         run: |
@@ -188,7 +204,7 @@ jobs:
       - lint
       - coverage-nix
       - coverage-win
-    runs-on: 'tenki-standard-autoscale'
+    runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
     permissions:
       contents: read
 
@@ -208,7 +224,7 @@ jobs:
         run: |
           npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
 
       - name: Run typescript tests
         run: |
@@ -220,7 +236,7 @@ jobs:
     needs:
       - test-typescript
       - test-unit
-    runs-on: tenki-standard-autoscale
+    runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
     permissions:
       contents: read
     steps:
@@ -230,7 +246,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: ${{ inputs.nodejs-version || 'lts/*' }}
           cache: 'npm'
           cache-dependency-path: package.json
           check-latest: true
@@ -238,12 +254,12 @@ jobs:
         run: |
           npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
       - name: install webpack stack
         run: |
           cd test/bundler/webpack && npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
       - name: Test webpack bundle
         run: |
           cd test/bundler/webpack && npm run test
@@ -251,7 +267,7 @@ jobs:
         run: |
           cd test/bundler/esbuild && npm install --ignore-scripts
         env:
-          npm_config_registry: https://registry.npmjs.org/
+          npm_config_registry: ${{ inputs.use-npm-registry && 'https://registry.npmjs.org/' || '' }}
       - name: Test esbuild bundle
         run: |
           cd test/bundler/esbuild && npm run test
@@ -265,7 +281,7 @@ jobs:
   #     - test-typescript
   #     - test-unit
   #     - package
-  #   runs-on: tenki-standard-autoscale
+  #   runs-on: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
   #   permissions:
   #     pull-requests: write
   #     contents: write
