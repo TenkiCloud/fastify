@@ -114,19 +114,12 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/coverage-nix.yml
-    with:
-      use-npm-registry: ${{ inputs.use-npm-registry || false }}
-      runner-label: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
-
   coverage-win:
     needs:
       - lint
     permissions:
       contents: read
     uses: ./.github/workflows/coverage-win.yml
-    with:
-      use-npm-registry: ${{ inputs.use-npm-registry || false }}
-      runner-label: ${{ inputs.runner-label || 'tenki-standard-autoscale' }}
 
   test-unit:
     needs:
